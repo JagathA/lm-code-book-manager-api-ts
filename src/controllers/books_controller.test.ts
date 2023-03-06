@@ -133,15 +133,36 @@ describe("POST /api/v1/books endpoint", () => {
 		expect(res.statusCode).toEqual(400);
 	});
 
+	test("status code not found 404 for a delete non existing book", async () => {
+		// Arrange
+		const mockGetBook = jest
+			.spyOn(bookService, "getBook")
+			.mockResolvedValue(undefined as unknown as Book);
+
+		const mockDeleteBook = jest.spyOn(bookService, "deleteBook");
+
+		// Act
+		const res = await request(app).delete("/api/v1/books/77");
+
+		// Assert
+		expect(res.statusCode).toEqual(404);
+		expect(mockGetBook).toBeCalledTimes(1);
+		expect(mockGetBook).toHaveBeenCalledWith(77);
+	});
+
 	test("status code successfully 200 for a delete book", async () => {
 		// Arrange
-		jest
-			.spyOn(bookService, "deleteBook")
+		const mockGetBook = jest
+			.spyOn(bookService, "getBook")
+			.mockResolvedValue(dummyBookData[1] as Book);
+
+		const mockDeleteBook = jest.spyOn(bookService, "deleteBook");
 
 		// Act
 		const res = await request(app).delete("/api/v1/books/1");
 
 		// Assert
 		expect(res.statusCode).toEqual(200);
+		expect(mockDeleteBook).toBeCalledTimes(1);
 	});
 });
